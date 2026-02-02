@@ -15,6 +15,7 @@ except:
 
 app = FastAPI()
 
+# 7
 @app.get("/api/stats/overview")
 def stats_overview():
     # On calcule les valeurs directement depuis ton fichier 'df'
@@ -33,6 +34,7 @@ def stats_overview():
         "most_common_type": most_common_type
     }
 
+#17
 @app.get("/api/customers/{customer_id}")
 def customer(customer_id: str):
     # On cherche le client s'il est l'expéditeur OU le destinataire
