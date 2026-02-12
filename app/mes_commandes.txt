@@ -1,0 +1,5 @@
+#activation de l'environnement du environnement
+venv\Scripts\activate
+
+#lancement du projet 
+uvicorn app.main:app --reload
