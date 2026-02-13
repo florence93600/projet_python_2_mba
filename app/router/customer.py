@@ -19,6 +19,7 @@ def list_customers_route():
 def get_top_customers(n: int = Query(10)):
     return top_customers(df, n=n)
 
+
 @router_customers.get("/api/customers/{customer_id}")
 async def customer_route(customer_id: str):
     """Recherche les informations d'un client par son ID"""
@@ -30,4 +31,3 @@ async def customer_route(customer_id: str):
             detail=f"Le client avec l'ID {customer_id} est introuvable"
         )
     return result    
-

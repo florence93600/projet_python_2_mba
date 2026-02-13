@@ -100,3 +100,4 @@ def get_customer_summary(customer_id: str) -> Optional[Dict[str, Any]]:
         "avg_amount": float(round(customer_df['Transaction Amount'].mean(), 2)),
         "is_fraudulent_user": bool(any(customer_df['Fraud Flag']))
     }    
+
