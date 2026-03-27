@@ -1,6 +1,6 @@
 # 🏦 Banking Transactions API
 
-**FastAPI 0.110+** | **Python 3.12+** | **Coverage 93%**
+**FastAPI 0.110+** | **Python 3.12+** 
 
 ## 1. Présentation du Projet
 Cette API REST robuste est conçue pour manipuler et analyser des données de transactions bancaires réelles. Grâce à une **Clean Architecture**, elle permet la recherche multicritère, le scoring de fraude et l'analyse statistique sur un volume de 1,42 Go de données.
@@ -50,17 +50,14 @@ uvicorn app.main:app --reload
 ```
 Documentation interactive disponible sur : `http://127.0.0.1:8000/docs`
 
-## 4. Tests et Qualité
-Le projet garantit une fiabilité élevée avec une couverture de tests de **93%**.
-
 ```bash
 pytest tests/
 pytest --cov=app tests/ --cov-report=term-missing
 ```
 
-## 5. Collaboration (Git Flow)
+## 4. Collaboration (Git Flow)
 * **Main / Developer :** Branches de production et d'intégration.
 * **Features :** Branches nominatives (Florence, Marie-Paule, Carole, Sylvain).
 
-## 6. Livraison
+## 5. Livraison
 **Format :** Package Python modulaire avec tests unitaires automatisés via Pull Request GitHub.
