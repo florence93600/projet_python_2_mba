@@ -1,10 +1,25 @@
 venv/
-.venv
-data/
+.venv/
+env/
+
 __pycache__/
 *.pyc
-.pytest_cache
+*.pyo
+*.pyd
+*.egg-info/
+
+.pytest_cache/
 .coverage
+htmlcov/
 
+dist/
+build/
 
+.vscode/
+.idea/
 
+*.log
+
+.DS_Store
+
+data/

@@ -3,3 +3,6 @@ venv\Scripts\activate
 
 #lancement du projet 
 uvicorn app.main:app --reload
+
+# lancement tests
+pytest --cov=app --cov-report=term-missing

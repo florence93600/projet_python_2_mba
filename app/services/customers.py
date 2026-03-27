@@ -1,77 +1,81 @@
 import pandas as pd
-from typing import List, Dict, Union, Optional
-from app.config import connexion_dataset
-
-# Chargement initial
-df_global = connexion_dataset()
+from typing import Any, Dict, List, Optional, Union
 
 
 def list_customers(df: pd.DataFrame) -> List[str]:
-    # Retourne la liste unique de tous les IDs clients (expéditeurs et destinataires).
-    combined = pd.concat([df["Sender Account ID"], df["Receiver Account ID"]])
-    return combined.dropna().astype(str).unique().tolist()
+
+    return sorted(df["client_id"].dropna().unique().astype(str).tolist())
 
 
-def top_customers(df: pd.DataFrame, n: int = 10) -> List[Dict[str, float]]:
-    # Top N clients par montant total envoyé.
+def top_customers(df: pd.DataFrame, n: int = 10) -> List[Dict[str, Any]]:
+
     top = (
-        df.groupby("Sender Account ID", as_index=False)["Transaction Amount"]
+        df.groupby("client_id", as_index=False)["amount"]
         .sum()
-        .sort_values("Transaction Amount", ascending=False)
+        .sort_values("amount", ascending=False)
         .head(n)
     )
+    top["amount"] = top["amount"].round(2)
+    top["client_id"] = top["client_id"].astype(str)
 
     return top.rename(
         columns={
-            "Sender Account ID": "customer_id",
-            "Transaction Amount": "total_amount"
+            "client_id": "customer_id",
+            "amount": "total_amount",
         }
     ).to_dict(orient="records")
 
 
+def get_customer_profile(df: pd.DataFrame, customer_id: str) -> Optional[Dict[str, Any]]:
+
+    subset = df[df["client_id"].astype(str) == str(customer_id)]
+
+    if subset.empty:
+        return None
+
+    return {
+        "id": customer_id,
+        "transactions_count": int(len(subset)),
+        "avg_amount": round(float(subset["amount"].mean()), 2),
+        "total_amount": round(float(subset["amount"].sum()), 2),
+        "fraudulent": bool(subset["is_fraud"].any()),
+    }
+
+
 def stats_by_type(df: pd.DataFrame) -> List[Dict[str, Union[str, float]]]:
-    # Statistiques par type de transaction.
+
     grouped = (
-        df.groupby("Transaction Type")["Transaction Amount"]
-        .agg(
-            count="count",
-            avg_amount="mean"
-        )
+        df.groupby("use_chip")["amount"]
+        .agg(count="count", avg_amount="mean")
         .reset_index()
-        .rename(columns={"Transaction Type": "transaction_type"})
+        .rename(columns={"use_chip": "transaction_type"})
     )
+    grouped["avg_amount"] = grouped["avg_amount"].round(2)
+    grouped["count"] = grouped["count"].astype(int)
 
     return grouped.to_dict(orient="records")
 
 
 def amount_distribution(
-    df: pd.DataFrame, 
-    bins: Optional[List[float]] = None
+    df: pd.DataFrame,
+    bins: Optional[List[float]] = None,
 ) -> Dict[str, List]:
-    # Distribution des montants par tranches.
+
     if bins is None:
         bins = [0, 100, 500, 1000, 5000, float("inf")]
 
-    # Correction de la génération des labels pour éviter l'erreur sur float('inf')
-    labels = []
-    for i in range(len(bins) - 1):
-        lower = int(bins[i])
-        upper = bins[i+1]
-        if upper == float('inf'):
-            labels.append(f"{lower}+")
-        else:
-            labels.append(f"{lower}-{int(upper)}")
+    labels = [
+        f"{int(bins[i])}-{int(bins[i + 1]) if bins[i + 1] != float('inf') else 'plus'}"
+        for i in range(len(bins) - 1)
+    ]
 
     counts = (
-        pd.cut(df["Transaction Amount"], bins=bins, labels=labels)
+        pd.cut(df["amount"], bins=bins, labels=labels)
         .value_counts()
         .sort_index()
     )
 
     return {
-        "labels": labels, # Changé 'bins' en 'labels' pour être plus explicite
-        "counts": counts.tolist()
+        "labels": labels,
+        "counts": counts.tolist(),
     }
-
-
-
